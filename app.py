@@ -19,19 +19,15 @@ def load_data():
         full_path = os.path.join(path, csv_files[0])
         df = pd.read_csv(full_path)
         
-        # --- ARREGLO DE COLUMNAS PARA EVITAR ERRORES ---
-        # Limpiamos espacios y estandarizamos nombres para que px.box no falle
-        df.columns = [c.strip().replace(' ', '_') for c in df.columns]
-        
-        # Mapeo de seguridad: asegura que los nombres coincidan con los gráficos
-        rename_map = {}
-        for col in df.columns:
-            if 'Salary' in col: rename_map[col] = 'Salary_USD'
-            if 'Job' in col or 'Role' in col: rename_map[col] = 'Job_Title'
-            if 'Experience' in col: rename_map[col] = 'Experience_Level'
-            if 'Skill' in col: rename_map[col] = 'Required_Skills'
-            if 'Year' in col: rename_map[col] = 'Year'
-            if 'Country' in col: rename_map[col] = 'Country'
+        # --- MAPEO EXACTO SEGÚN TUS COLUMNAS DETECTADAS ---
+        # Renombramos para que coincidan con tu lógica original del Dashboard
+        rename_map = {
+            'job_title': 'Job_Title',
+            'salary': 'Salary_USD',
+            'experience_level': 'Experience_Level',
+            'job_posting_year': 'Year',
+            'country': 'Country'
+        }
         
         df.rename(columns=rename_map, inplace=True)
         return df
@@ -60,7 +56,7 @@ if page == "Inicio":
     
     **Objetivos del Proyecto:**
     * Visualizar la evolución salarial por roles.
-    * Identificar las habilidades más demandadas en IA.
+    * Identificar las tendencias en IA.
     * Analizar la distribución geográfica del empleo.
     
     *Utiliza el menú de la izquierda para explorar el Dashboard.*
@@ -73,40 +69,49 @@ elif page == "Dashboard":
     st.title("📊 Panel de Control de Datos")
     
     if df is not None:
-        # Verificación de columnas mínimas para evitar errores de Plotly
-        if 'Salary_USD' in df.columns and 'Job_Title' in df.columns:
-            # Métricas rápidas
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Total de Registros", len(df))
-            col2.metric("Salario Promedio (USD)", f"${df['Salary_USD'].mean():,.0f}")
-            col3.metric("Países representados", df['Country'].nunique() if 'Country' in df.columns else "N/A")
+        # Métricas rápidas
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total de Registros", len(df))
+        
+        # Usamos los nombres ya mapeados
+        salario_medio = df['Salary_USD'].mean() if 'Salary_USD' in df.columns else 0
+        col2.metric("Salario Promedio (USD)", f"${salario_medio:,.0f}")
+        
+        total_paises = df['Country'].nunique() if 'Country' in df.columns else 0
+        col3.metric("Países representados", total_paises)
 
-            st.divider()
+        st.divider()
 
-            # Gráfico 1: Distribución de Salarios por Rol
-            st.subheader("Distribución de Salarios por Rol")
-            fig_salary = px.box(df, x='Job_Title', y='Salary_USD', 
-                                color='Experience_Level' if 'Experience_Level' in df.columns else None,
-                                title="Salarios por Título y Nivel de Experiencia")
-            st.plotly_chart(fig_salary, use_container_width=True)
+        # Gráfico 1: Distribución de Salarios por Rol
+        st.subheader("Distribución de Salarios por Rol")
+        fig_salary = px.box(df, x='Job_Title', y='Salary_USD', 
+                            color='Experience_Level' if 'Experience_Level' in df.columns else None,
+                            title="Salarios por Título y Nivel de Experiencia")
+        st.plotly_chart(fig_salary, use_container_width=True)
 
-            # Gráfico 2: Evolución de Contrataciones (Timeline)
-            if 'Year' in df.columns:
-                st.subheader("Tendencia de Contratación (2020-2026)")
-                df_year = df.groupby('Year').size().reset_index(name='Jobs')
-                fig_trend = px.line(df_year, x='Year', y='Jobs', markers=True, 
-                                    title="Crecimiento de Empleos en el Tiempo")
-                st.plotly_chart(fig_trend, use_container_width=True)
+        # Gráfico 2: Evolución de Contrataciones
+        if 'Year' in df.columns:
+            st.subheader("Tendencia de Contratación (2020-2026)")
+            df_year = df.groupby('Year').size().reset_index(name='Jobs')
+            fig_trend = px.line(df_year, x='Year', y='Jobs', markers=True, 
+                                title="Crecimiento de Empleos en el Tiempo")
+            st.plotly_chart(fig_trend, use_container_width=True)
 
-            # Gráfico 3: Skills más demandados (Top 10)
-            if 'Required_Skills' in df.columns:
-                st.subheader("Habilidades más demandadas")
-                top_skills = df['Required_Skills'].str.split(',').explode().str.strip().value_counts().head(10)
-                fig_skills = px.bar(top_skills, x=top_skills.values, y=top_skills.index, orientation='h',
-                                   labels={'x': 'Frecuencia', 'y': 'Habilidad'},
-                                   color=top_skills.values, color_continuous_scale='Viridis')
-                st.plotly_chart(fig_skills, use_container_width=True)
-        else:
-            st.error(f"Error de columnas. Se detectaron: {list(df.columns)}")
+        # Gráfico 3: Análisis de habilidades específicas del dataset
+        # Como este dataset tiene columnas separadas para skills (skills_python, etc.)
+        st.subheader("Demanda de Habilidades Técnicas")
+        skill_cols = [c for c in df.columns if 'skills_' in c]
+        if skill_cols:
+            # Sumamos los valores (asumiendo que son 1 y 0 o booleanos)
+            skill_counts = df[skill_cols].sum().sort_values(ascending=False)
+            # Limpiamos los nombres para el gráfico
+            skill_counts.index = [c.replace('skills_', '').capitalize() for c in skill_counts.index]
+            
+            fig_skills = px.bar(skill_counts, x=skill_counts.values, y=skill_counts.index, 
+                               orientation='h', title="Presencia de Skills en Vacantes",
+                               labels={'x': 'Número de Vacantes', 'y': 'Habilidad'},
+                               color=skill_counts.values, color_continuous_scale='Viridis')
+            st.plotly_chart(fig_skills, use_container_width=True)
+
     else:
-        st.error("No se pudo cargar el dataset. Verifica la conexión con Kaggle.")
+        st.error("No se pudo cargar el dataset.")
