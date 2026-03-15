@@ -47,6 +47,8 @@ if page == "Inicio":
     * Identificar las habilidades más demandadas en IA.
     * Analizar la distribución geográfica del empleo.
     
+    * Realizado por: Michely Muñoz.
+    
     *Utiliza el menú de la izquierda para explorar el Dashboard.*
     """)
     
