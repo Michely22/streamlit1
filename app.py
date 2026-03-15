@@ -58,7 +58,9 @@ if page == "Inicio":
     * Visualizar la evolución salarial por roles.
     * Identificar las tendencias en IA.
     * Analizar la distribución geográfica del empleo.
-    
+
+    * Desarrollado por: Michely Muñoz.
+      
     *Utiliza el menú de la izquierda para explorar el Dashboard.*
     """)
     
