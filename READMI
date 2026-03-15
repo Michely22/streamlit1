@@ -1,0 +1,24 @@
+# 🚀 AI & Data Science Job Market Analysis (2020–2026)
+
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![Kaggle](https://img.shields.io/badge/Kaggle-20BEFF?style=for-the-badge&logo=Kaggle&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)
+
+## 📝 Descripción del Proyecto
+Este proyecto consiste en un **Tablero de Control Interactivo** desarrollado con **Streamlit** para analizar las tendencias del mercado laboral en Inteligencia Artificial y Ciencia de Datos. El dataset utilizado es sintético pero diseñado para reflejar patrones reales de contratación, salarios y habilidades requeridas a nivel global entre los años 2020 y 2026.
+
+## 📊 Características principales
+* **Landing Page:** Introducción al proyecto con contexto visual.
+* **Filtros Dinámicos:** Exploración de datos por nivel de experiencia y roles.
+* **Visualizaciones:** Gráficos de salarios, tendencias temporales y análisis de habilidades técnicas.
+* **Integración Directa:** Carga de datos automatizada mediante el API de Kaggle.
+
+## 🛠️ Instalación y Ejecución
+Para correr este proyecto localmente o en un entorno de producción:
+
+1. Clonar el repositorio.
+2. Instalar las dependencias:
+   ```bash
+   pip install -r requirements.txt
